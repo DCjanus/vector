@@ -2,4 +2,4 @@
 
 set -e
 
-http POST http://localhost:8749 message="Hello, world!"
+http -v POST http://localhost:8749 message="Hello, world!" object:='{"foo": "bar", "names": ["DCjanus", "ZHUANGBISHENG"]}'
