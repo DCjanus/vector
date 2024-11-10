@@ -68,7 +68,7 @@ pub mod http;
 pub mod humio;
 #[cfg(any(feature = "sinks-influxdb", feature = "prometheus-integration-tests"))]
 pub mod influxdb;
-#[cfg(feature = "sinks-journald")]
+#[cfg(all(unix, feature = "sinks-journald"))]
 pub mod journald;
 #[cfg(feature = "sinks-kafka")]
 pub mod kafka;

@@ -1,14 +1,9 @@
-use crate::config::{AcknowledgementsConfig, Input, SinkConfig, SinkContext, SourceContext};
+use crate::config::{AcknowledgementsConfig, Input, SinkConfig, SinkContext};
 use crate::sinks::prelude::*;
 use crate::sinks::{Healthcheck, VectorSink};
-use async_trait::async_trait;
-use std::future::Future;
-use std::io::Write;
 use std::path::PathBuf;
-use std::pin::Pin;
 use tokio::net::UnixDatagram;
 use vector_lib::configurable::configurable_component;
-use crate::sinks::util::unix::UnixSinkConfig;
 // reference: https://systemd.io/JOURNAL_NATIVE_PROTOCOL/
 
 /// Configuration for the `JournalD` sink.
@@ -40,7 +35,6 @@ fn default_journald_socket_path() -> PathBuf {
 impl SinkConfig for JournaldSinkConfig {
     async fn build(&self, cx: SinkContext) -> crate::Result<(VectorSink, Healthcheck)> {
         let healthcheck = async move { Ok(()) }.boxed(); // TODO: implement healthcheck
-        let target = UnixDatagram::bind()
         let sink = JournalSink {}; // TODO: implement JournalSink
         Ok((VectorSink::from_event_streamsink(sink), healthcheck))
     }
@@ -65,9 +59,7 @@ impl Default for JournaldSinkConfig {
     }
 }
 
-struct JournalSink {
-    socket: UnixDatagram,
-}
+struct JournalSink {}
 
 #[async_trait::async_trait]
 impl StreamSink<Event> for JournalSink {
@@ -83,14 +75,5 @@ impl JournalSink {
             println!("{}", data);
         }
         Ok(())
-    }
-}
-
-struct JournaldEncoder {}
-
-impl encoding::Encoder<Event> for JournaldEncoder {
-    fn encode_input(&self, input: Event, writer: &mut dyn Write) -> std::io::Result<(usize, GroupedCountByteSize)> {
-        let log = input.into_log();
-        todo!()
     }
 }
