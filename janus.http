@@ -1,0 +1,6 @@
+POST localhost:8749
+Content-Type: application/json
+
+{
+  "message": "Hello, world!"
+}

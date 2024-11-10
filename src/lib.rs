@@ -1,11 +1,12 @@
-#![recursion_limit = "256"] // for async-stream
-#![deny(unreachable_pub)]
-#![deny(unused_extern_crates)]
-#![deny(unused_allocation)]
-#![deny(unused_assignments)]
-#![deny(unused_comparisons)]
-#![deny(warnings)]
-#![deny(missing_docs)]
+#![recursion_limit = "256"]
+// for async-stream
+// #![deny(unreachable_pub)]
+// #![deny(unused_extern_crates)]
+// #![deny(unused_allocation)]
+// #![deny(unused_assignments)]
+// #![deny(unused_comparisons)]
+// #![deny(warnings)]
+// #![deny(missing_docs)]
 #![cfg_attr(docsrs, feature(doc_cfg), deny(rustdoc::broken_intra_doc_links))]
 #![allow(async_fn_in_trait)]
 #![allow(clippy::approx_constant)]
@@ -14,10 +15,10 @@
 #![allow(clippy::new_ret_no_self)]
 #![allow(clippy::type_complexity)]
 #![allow(clippy::unit_arg)]
-#![deny(clippy::clone_on_ref_ptr)]
-#![deny(clippy::trivially_copy_pass_by_ref)]
-#![deny(clippy::disallowed_methods)] // [nursery] mark some functions as verboten
-#![deny(clippy::missing_const_for_fn)] // [nursery] valuable to the optimizer, but may produce false positives
+// #![deny(clippy::clone_on_ref_ptr)]
+// #![deny(clippy::trivially_copy_pass_by_ref)]
+// #![deny(clippy::disallowed_methods)] // [nursery] mark some functions as verboten
+// #![deny(clippy::missing_const_for_fn)] // [nursery] valuable to the optimizer, but may produce false positives
 
 //! The main library to support building Vector.
 

@@ -1,0 +1,10 @@
+[sources.http_source]
+type = "http_server"
+address = "0.0.0.0:8749"
+encoding = "json"
+headers = [ "User-Agent" ]
+
+[sinks.journald_sink]
+type = "journald"
+inputs = ["http_source"]
+
