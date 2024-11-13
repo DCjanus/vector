@@ -2,13 +2,13 @@ use crate::config::{AcknowledgementsConfig, Input, SinkConfig, SinkContext};
 use crate::sinks::prelude::*;
 use crate::sinks::{Healthcheck, VectorSink};
 use bytes::BufMut;
-use encoding::Encoder;
-use snafu::ResultExt;
+use nix::errno::Errno;
+use nix::fcntl::{fcntl, FcntlArg, SealFlag};
+use nix::sys::memfd::{memfd_create, MemFdCreateFlag};
+use std::os::fd::AsRawFd;
 use std::path::PathBuf;
 use tokio::net::UnixDatagram;
 use vector_lib::configurable::configurable_component;
-use vrl::core::encode_key_value::EncodingError;
-use vrl::value::KeyString;
 // reference: https://systemd.io/JOURNAL_NATIVE_PROTOCOL/
 
 /// Configuration for the `JournalD` sink.
@@ -90,19 +90,26 @@ impl JournalSink {
                 write_field_name(&k, &mut buffer);
                 write_field_value(v, &mut buffer);
             }
-            // TODO: error handle for send_to
-            self.socket
-                .send_to(&buffer, &self.target)
-                .await
-                .expect("Failed to send data to JournalD");
+            // TODO: handle errors
+            match self.socket.send_to(&buffer, &self.target).await {
+                Ok(_) => {}
+                Err(e) if e.raw_os_error() == Some(Errno::EMSGSIZE as i32) => self
+                    .send_via_memfd(&buffer)
+                    .await
+                    .expect("send memfd failed"),
+                Err(e) => Err(e).expect("send failed"),
+            };
             buffer.clear();
         }
         Ok(())
     }
+
+    async fn send_via_memfd(&self, data: &[u8]) -> Result<(), std::io::Error> {
+        todo!()
+    }
 }
 
 /// Convert a field name to a valid field name in JournalD.
-/// This logger mangles the keys of additional key-values on records and names of custom fields according to the following rules, to turn them into valid journal fields:
 /// This function magles the field name to a valid field name in JournalD according to the following rules:
 ///
 /// - If the field name is empty, replace it with "EMPTY".
