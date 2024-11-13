@@ -3,9 +3,6 @@ use crate::sinks::prelude::*;
 use crate::sinks::{Healthcheck, VectorSink};
 use bytes::BufMut;
 use nix::errno::Errno;
-use nix::fcntl::{fcntl, FcntlArg, SealFlag};
-use nix::sys::memfd::{memfd_create, MemFdCreateFlag};
-use std::os::fd::AsRawFd;
 use std::path::PathBuf;
 use tokio::net::UnixDatagram;
 use vector_lib::configurable::configurable_component;
@@ -38,7 +35,7 @@ fn default_journald_socket_path() -> PathBuf {
 #[async_trait::async_trait]
 #[typetag::serde(name = "journald")]
 impl SinkConfig for JournaldSinkConfig {
-    async fn build(&self, cx: SinkContext) -> crate::Result<(VectorSink, Healthcheck)> {
+    async fn build(&self, _cx: SinkContext) -> crate::Result<(VectorSink, Healthcheck)> {
         let socket = UnixDatagram::unbound()?;
         let target = self.path.clone();
 
@@ -104,7 +101,7 @@ impl JournalSink {
         Ok(())
     }
 
-    async fn send_via_memfd(&self, data: &[u8]) -> Result<(), std::io::Error> {
+    async fn send_via_memfd(&self, _data: &[u8]) -> Result<(), std::io::Error> {
         todo!()
     }
 }
